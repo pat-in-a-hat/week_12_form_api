@@ -32,12 +32,10 @@
             <div class="col-sm-6">
                 <select class="form-select" id="volume">
                     <option selected>Cups of food eaten</option>
-                    <option value="0.25">1/4 cup</option>
-                    <option value="0.5">1/2 cup</option>
-                    <option value="0.75">3/4 cup</option>
+                    <option value="1/4">1/4 cup</option>
+                    <option value="1/2">1/2 cup</option>
+                    <option value="3/4">3/4 cup</option>
                     <option value="1">1 cup</option>
-                    <option value="1.5">1.5 cups</option>
-                    <option value="2">2 cups</option>
                 </select>
             </div>
             <div class="col-sm-6">
@@ -60,11 +58,13 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th scope="col">#</th>
                     <th scope="col">Food</th>
                     <th scope="col">Amount Eaten (cups)</th>
                     <th scope="col">Time</th>
                     <th scope="col">Notes</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">Edit</th>
+                    <th scope="col">Delete</th>
                 </tr>
             </thead>
             <tbody id="table-body">
@@ -74,7 +74,7 @@
 
     </div>
     
-    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
     <script src="pickem-project.js"></script>
 </body>
 </html>
