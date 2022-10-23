@@ -2,25 +2,9 @@
 //Author: Patrick Warner
 //10/22
 
-let formValidator = () => {
-    let food = document.getElementById('food-input')//food submission text box
-    let msg = document.getElementById('msg')//alert message that posts
-    let time = document.getElementById('time')//time input
-    let volume = document.getElementById('volume')//selector to list how much you ate in cups
-    let notes = document.getElementById('notes')//extra text box for additional notes
-    if(food.value === '') {
-        msg.className = "alert alert-danger text-center"
-        msg.textContent = 'You must list what you ate!'
-        console.log('food text input failure')
-        return false
-    } else {
-        console.log('food submission success')
-        msg.className = 'mb-3 text-center'
-        msg.textContent = ''
-        return true
-    }
-}
 
+//APIs command help courtesy of our instructor Frank
+//https://replit.com/@stepanski/Week-6-Fetch-API#script.js
 //get all the data
 // GET ALL DATA:
 const getAllFoods = async () => {
@@ -36,7 +20,7 @@ const getAllFoods = async () => {
         console.log(error)
      }
 }
-getAllFoods();
+getAllFoods();//initial run to get table loaded upon page load
 
 //sending to API (POST)
 const createFood = async (foodinput, volumeinput, timeinput, notesinput) => {
@@ -85,23 +69,9 @@ const deleteFood = async (data_id) => {
     getAllFoods()
   }
 
-//get a piece of data to then update
-const getFood = async (data_id) => {
-
-    const url = `https://634f6de2df22c2af7b512858.mockapi.io/pickem/foodlist/${data_id}`;
-     
-    try {
-        const response = await fetch(url);
-        const food = await response.json()
-        build
-     } catch (error) {
-        console.log(error)
-     }
-  }
-
 
 //update data in API (PUT)
-const editFood = async (data_id) => {
+const editFood = async (data_id, foodinput, volumeinput, timeinput, notesinput) => {
 
     const url = `https://634f6de2df22c2af7b512858.mockapi.io/pickem/foodlist/${data_id}`;
 
@@ -123,8 +93,11 @@ const editFood = async (data_id) => {
     } catch (error) {
       return error;
     }
+    document.getElementById('table-body').replaceChildren();
+    getAllFoods()
   }
 
+  //builds the table based on DB/API data with interactive delete and edit buttons
 function tableBuilder(list) {
     //console.log(list)
     for (let i of list){
@@ -146,7 +119,13 @@ function tableBuilder(list) {
         edit_btn.setAttribute('type', 'button')
         edit_btn.setAttribute('data-bs-toggle', 'modal')
         edit_btn.setAttribute('data-bs-target', '#editModal')
-        //edit_btn.addEventListener('click', () => modalTime(i.id))
+        edit_btn.addEventListener('click', () => {
+            document.getElementById('food-text-modal').value = i.food
+            document.getElementById('food-volume-modal').textContent = `Cups Eaten: ${i.volume}`
+            document.getElementById('food-time-modal').textContent = `Time: ${i.time}`
+            document.getElementById('food-notes-modal').textContent = `${i.notes}`
+            document.getElementById('food-notes-modal').value = i.id
+        })
         edit_btn.textContent = 'Edit'
         edit_btn.className = 'btn btn-success'
 
@@ -177,6 +156,9 @@ function tableBuilder(list) {
     }
 }
 
+//builds a modal which allows you to edit your submission
+//probably unnecessary to build, next time will make in HTML and just interact parts with JS
+//ended up getting tired so made it so you could only change the food, others are locked
 function modalTime(){
     let bigdiv = document.createElement('div')
     bigdiv.className = 'modal fade'
@@ -213,6 +195,7 @@ function modalTime(){
     bodydiv.className = 'modal-body'
     contentdiv.appendChild(bodydiv)
 
+    let br = document.createElement('br')
     let foodLabel = document.createElement('label')
     foodLabel.setAttribute('for', 'foodInput')
     foodLabel.className = 'form-label'
@@ -220,11 +203,29 @@ function modalTime(){
     let foodText = document.createElement('input')
     foodText.setAttribute('type','text')
     foodText.className = 'form-control'
+    foodText.setAttribute('id', 'food-text-modal')
     bodydiv.appendChild(foodLabel)
     bodydiv.appendChild(foodText)
+    bodydiv.appendChild(br)
 
+    let br1 = document.createElement('br')
+    let foodvolume = document.createElement('label')
+    foodvolume.className = 'form-label'
+    foodvolume.setAttribute('id', 'food-volume-modal')
+    bodydiv.appendChild(foodvolume)
+    bodydiv.appendChild(br1)
 
-    //add in the form inputs here
+    let br2 = document.createElement('br')
+    let foodtime = document.createElement('label')
+    foodtime.className = 'form-label'
+    foodtime.setAttribute('id', 'food-time-modal')
+    bodydiv.appendChild(foodtime)
+    bodydiv.appendChild(br2)
+
+    let foodnotes = document.createElement('label')
+    foodnotes.className = 'form-label'
+    foodnotes.setAttribute('id', 'food-notes-modal')
+    bodydiv.appendChild(foodnotes)
 
     let footerdiv = document.createElement('div')
     footerdiv.className = 'modal-footer'
@@ -239,16 +240,26 @@ function modalTime(){
 
     let savechangesbtn =  document.createElement('button')
     savechangesbtn.setAttribute('type', 'button')
+    savechangesbtn.setAttribute('id', 'save-changes-modal')
+    savechangesbtn.setAttribute('data-bs-dismiss', 'modal')
     savechangesbtn.className = 'btn btn-success'
     savechangesbtn.textContent = 'Save changes'
     footerdiv.appendChild(savechangesbtn)
 
-    const myModal = document.getElementById('edit-modal')
-    const myInput = document.getElementById('')
+    document.getElementById('save-changes-modal').addEventListener('click', () => {
+        const foodId = document.getElementById('food-notes-modal').value
+        const food = document.getElementById('food-text-modal').value
+        const volume = document.getElementById('food-volume-modal').value
+        const time = document.getElementById('food-time-modal').value
+        const notes = document.getElementById('food-notes-modal').textContent
+        editFood(foodId, food, volume, time, notes)
+    })
+
 
 }
 modalTime();
 
+//submits the form to the API
 function submitButton(){
     let btn = document.getElementById('submit')
     let food = document.getElementById('food-input')//food submission text box
@@ -267,15 +278,40 @@ function submitButton(){
 submitButton();
 
 
-/*document.querySelector('btn-secondary').addEventListener('click', () => {
-    deleteFood(this.id.slice(2))
-})
+//Was initially also building a form validator that would require forms to be fully filled out before submission
+//ran out of time so skeleton placed in the code graveyard at the bottom of this weeks js
+/*
+let formValidator = () => {
+    let food = document.getElementById('food-input')//food submission text box
+    let msg = document.getElementById('msg')//alert message that posts
+    //let time = document.getElementById('time')//time input
+    //let volume = document.getElementById('volume')//selector to list how much you ate in cups
+    //let notes = document.getElementById('notes')//extra text box for additional notes
+    if(food.value === '') {
+        msg.className = "alert alert-danger text-center"
+        msg.textContent = 'You must list what you ate!'
+        console.log('food text input failure')
+        return false
+    } else {
+        console.log('food submission success')
+        msg.className = 'mb-3 text-center'
+        msg.textContent = ''
+        return true
+    }
+}*/
 
-/*form.addEventListener('submit', (btn) => {
-    btn.preventDefault()
-    formValidator()
-})*/
+//not needed because I call up and parsed these in table
+/*
+//get a piece of data to then update
+const getFood = async (data_id) => {
 
-
-//need to build table that prints from API
-//need to build edit and delete buttons
+    const url = `https://634f6de2df22c2af7b512858.mockapi.io/pickem/foodlist/${data_id}`;
+     
+    try {
+        const response = await fetch(url);
+        const food = await response.json()
+        return food
+     } catch (error) {
+        console.log(error)
+     }
+  }*/
